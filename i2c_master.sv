@@ -5,6 +5,8 @@ module i2c_master (
   input rw,  
   input [7:0] data_w,   
   input start,   
+  input t_sda,      /////////////////////
+
 
   output logic [7:0] data_out,
   output logic valid_out, // READ finish
@@ -40,7 +42,6 @@ logic [3:0] bit_counter;
 logic [7:0] reg_dataout;
 logic write_done;
 logic done; 
-logic t_sda;      /////////////////////
 
 
 logic load; 
@@ -275,7 +276,7 @@ always_ff @(posedge clk, negedge rst_n) begin
   end
 end
 
-assign sda = en_sda ? reg_sda : /*t_sda;  //*/  1'bz;
+assign sda = en_sda ? reg_sda : t_sda;  //*/  1'bz;
 assign data_out = valid_out ? reg_dataout : 0;
 assign scl = reg_scl ;
 endmodule
