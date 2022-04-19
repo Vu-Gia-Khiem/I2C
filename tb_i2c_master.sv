@@ -12,6 +12,7 @@
    logic busy;
    logic erro_addr;
    logic  t_sda;
+   logic [3:0] N_byte;
 
    i2c_master dut (
      .clk(clk),
@@ -34,7 +35,7 @@
      addr = 7'b0010000;
      data_w = 8'd0;
      start = 1'b0;
-     rw = 1;
+     rw = 0;
      clk = 1'b1;
      rst_n = 1'b0;
      #40;

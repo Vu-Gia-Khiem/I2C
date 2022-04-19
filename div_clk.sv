@@ -14,13 +14,15 @@ always_ff @(posedge clk, negedge rst_n) begin
     high <= 1'b1;
   end 
   else begin
-  if(en_clk) begin
-    count <= (count == 5) ? 0 : count + 1'b1 ;
-    high  <= (count == 5) ? !high : high ;
-  end
-  else
+    if(en_clk) begin
+      count <= (count == 5) ? 0 : count + 1'b1 ;
+      high  <= (count == 5) ? !high : high ;
+    end
+    else begin
     count <= 0 ;
-end
+    high <= 1'b1;
+    end
+  end
 end
 
 assign sample_h = ( count == 5 ) & high;

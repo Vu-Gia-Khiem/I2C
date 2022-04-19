@@ -3,9 +3,9 @@ module i2c_top(
   input rst_n,   
   input [6:0] addr,   
   input rw,  
-  input [7:0] data_w,   
-  input start,   
-  input t_sda,      /////////////////////
+  input [39:0] data_w,   
+  input start,  
+  input [3:0] N_byte,
 
   output logic [7:0] data_out,
   output logic valid_out, // READ finish
