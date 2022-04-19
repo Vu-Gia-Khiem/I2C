@@ -13,13 +13,15 @@ wire sda;
 logic busy;
 logic erro_addr ;
 
-    i2c_top  i2c_top(
+    i2c_top  dut(
         .*
     );
 
     pullup p1(scl);
     pullup p2(sda);
-    
+
+//assign sda = !dut.en_sda ? t_sda : 1'bz;
+ 
 always #20 clk = !clk;
 
 initial begin
@@ -35,14 +37,14 @@ initial begin
     start = 1'b1;
     #50;
     start = 1'b0;
-    // repeat(9) begin
-    //   @(negedge dut.sample_l);
-    // end
-    // t_sda = 0;
-    // repeat(9) begin
-    //   @(negedge dut.sample_l);
-    // end
-    // t_sda = 0;
+//    repeat(9) begin
+//      @(negedge dut.sample_l);
+//    end
+//    t_sda = 0;
+//    repeat(9) begin
+//      @(negedge dut.sample_l);
+//    end
+    t_sda = 0;
     #50000;
     $finish;
 

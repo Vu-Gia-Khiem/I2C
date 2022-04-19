@@ -174,6 +174,11 @@ module i2c_slave_model (scl, sda);
 	always @(posedge sda)
 	  if(scl)
 	    begin
+			mem[0] <= 'd3;
+			mem[1] <= 'd0;
+			mem[2]  <= 'd0;
+			mem[3]  <= 'd0;
+			mem_adr <= 'd0;
 	       sta <= #1 1'b0;
 	       sto <= #1 1'b1;
 

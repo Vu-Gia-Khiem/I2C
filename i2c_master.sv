@@ -149,7 +149,7 @@ always_comb begin
       scl_p = 1'b1;
     end
   end
-  WRITE: begin
+  WRITE: begin                      //  n=48
     if (sample_l) begin
       scl_n = 1'b1;
       shift_w_data = 1'b1;
@@ -276,7 +276,7 @@ always_ff @(posedge clk, negedge rst_n) begin
   end
 end
 
-assign sda = en_sda ? reg_sda : t_sda;  //*/  1'bz;
+assign sda = en_sda ? reg_sda :   1'bz;
 assign data_out = valid_out ? reg_dataout : 0;
 assign scl = reg_scl ;
 endmodule
