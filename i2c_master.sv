@@ -102,7 +102,6 @@ always_comb begin
   write_done = 1'b0;
   case (cur_state)
   IDLE: begin 
-    write_done_addr_mem = 1'b0;
     if (start & !busy) begin
       next_state = START ;
       load = 1'b1;
