@@ -58,7 +58,6 @@ logic shift_addr_rw;
 logic clear_bit_counter; 
 logic plus_bit_couter;
 logic begin_stop;
-logic stop;
 logic send_ack;
 logic write_done_addr_mem;
 
