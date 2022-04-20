@@ -4,6 +4,7 @@ module i2c_master (
   input [6:0] addr,   
   input rw,  
   input [39:0] data_w,   
+  // input [7:0] data_w,   
   input start,   
   input [3:0] N_byte,
 
@@ -36,6 +37,7 @@ logic sample_h;
 logic sample_l; 
 
 logic [39:0] reg_data_w;
+// logic [7:0] reg_data_w;
 logic [7:0] reg_dataout;
 logic reg_rw;
 logic [7:0] reg_N_byte;
@@ -55,6 +57,7 @@ logic shift_r_data;
 logic shift_addr_rw;
 logic clear_bit_counter; 
 logic plus_bit_couter;
+logic begin_stop;
 logic stop;
 logic send_ack;
 logic write_done_addr_mem;
@@ -91,6 +94,7 @@ always_comb begin
   clear_bit_counter = 1'b0;
   plus_bit_couter = 1'b0;
   stop = 1'b0;
+  begin_stop = 1'b0;
   erro_addr = 1'b0;
   send_ack = 1'b0;
   en_sda = 1'b1;
@@ -101,8 +105,8 @@ always_comb begin
   valid_out = 1'b0;
   write_done = 1'b0;
   case (cur_state)
-  IDLE: begin 
-        write_done_addr_mem = 1'b0; 
+  IDLE: begin
+    write_done_addr_mem = 1'b0; 
     if (start & !busy) begin
       next_state = START ;
       load = 1'b1;
@@ -138,23 +142,27 @@ always_comb begin
   end
   R_ACK: begin 
     en_sda = 1'b0;
-    if (sample_h) begin
-      if (!sda) begin   // sda_in = 0 <=> R_ACK = 1
+    if (sample_l) begin
+    scl_n = 1'b1;   
+      if (!sda) begin   
         rack_done = 1'b1;
       end
       else begin
-        next_state = IDLE;
+        next_state = STOP;
         erro_addr = 1'b1 ;
       end
     end
     if (sample_l & rack_done) begin
-      if (write_done_addr_mem) begin    //setup addr read mem
+        scl_n = 1'b1;   
+      if (write_done_addr_mem) begin    
+         scl_n = 1'b1;   
         if (reg_N_byte != 0) begin
           next_state = WRITE;
           shift_w_data = 1'b1;
           plus_bit_couter = 1'b1;
         end
         else begin
+          begin_stop = 1'b1;
           write_done_addr_mem = 1'b0;
           next_state = STOP;
         end
@@ -178,7 +186,7 @@ always_comb begin
       if (bit_counter == 8) begin
         clear_bit_counter = 1'b1;
         next_state = R_ACK;
-        write_done_addr_mem = 1'b1;              ///// write done addr_mem
+        write_done_addr_mem = 1'b1; 
       end
       else begin
         shift_addr_rw = 1'b1;
@@ -240,6 +248,8 @@ always_comb begin
         next_state = READ;
       end
       else begin
+        en_sda = 1'b1;
+        begin_stop = 1'b1;
         next_state = STOP;
       end
     end
@@ -256,7 +266,6 @@ always_comb begin
       stop_scl = 1'b1;
     end
     if (sample_l) begin
-      en_sda = 1'b1;////////////////
       stop_sda = 1'b1;
       next_state = IDLE;
       en_clk = 1'b0;
@@ -296,6 +305,8 @@ always_ff @(posedge clk, negedge rst_n) begin
     if (shift_w_data | shift_addr_rw) begin
       reg_sda <= reg_data_w[39];
       reg_data_w <= {reg_data_w[38:0], 1'b0};
+      // reg_sda <= reg_data_w[7];
+      // reg_data_w <= {reg_data_w[6:0], 1'b0};
     end
     if (shift_r_data) begin
       reg_dataout <= {reg_dataout[6:0] ,sda };
@@ -310,6 +321,9 @@ always_ff @(posedge clk, negedge rst_n) begin
       reg_scl <= 1'b1;
       reg_sda <= 1'b0;
       busy <= 1'b1;
+    end
+    if(begin_stop) begin
+      reg_sda <= 1'b0;
     end
     if (stop_sda) begin
       reg_sda <= 1'b1;
